@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 # Prepare a design handoff
 
-Target: `$ARGUMENTS`. Load `design-handoff`; ground token/component formats via
+Target: `$ARGUMENTS`. Load `dev-handoff`; ground token/component formats via
 `design-grounding`.
 
 1. **Tokens** — emit the design as semantic tokens (color/type/space/radius/shadow/

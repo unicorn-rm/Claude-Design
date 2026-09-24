@@ -44,12 +44,12 @@ PRODUCING_SKILLS = [
     "color-systems", "typography", "illustration-and-imagery", "iconography",
     "motion-and-interaction", "web-3d", "3d-assets-and-shaders",
     "generative-and-creative-coding", "design-to-artifact", "brand-identity",
-    "design-systems", "data-visualization", "design-critique",
+    "design-systems", "data-visualization", "visual-critique",
 ]
 # Knowledge/process skills -> reference design-grounding.
 GROUNDED_SKILLS = [
     "responsive-design", "accessibility", "ux-principles", "design-research",
-    "design-handoff",
+    "dev-handoff",
 ]
 ALL_DOMAIN = PRODUCING_SKILLS + GROUNDED_SKILLS
 

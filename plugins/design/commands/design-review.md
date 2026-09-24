@@ -10,7 +10,7 @@ allowed-tools: Read, WebFetch, Grep, Glob
 Target: `$ARGUMENTS`. A superset of `/design:critique` that also covers
 accessibility, responsive, and UX. Ground everything via `design-grounding`.
 
-1. **Craft & anti-slop** (`design-critique`, `distinctive-design`): intent/one
+1. **Craft & anti-slop** (`visual-critique`, `distinctive-design`): intent/one
    idea, the tells present, hierarchy, type, color, layout, spacing.
 2. **Accessibility** (`accessibility`): real WCAG **contrast ratios** (report the
    numbers), keyboard operability + visible focus, semantic structure + labels,

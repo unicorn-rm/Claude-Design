@@ -75,7 +75,7 @@ site> and set it in <this real typeface>" is.
 
 When critiquing, name the specific tells present, then give the specific fix and,
 where useful, a real reference to steal from. Vague ("make it more modern") is
-banned. See `design-critique`.
+banned. See `visual-critique`.
 
 ## Teaching mode
 

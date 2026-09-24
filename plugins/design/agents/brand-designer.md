@@ -23,7 +23,7 @@ coherent everywhere and impossible to mistake for a template.
    (`color-systems`), a typographic voice (`typography`), imagery style
    (`illustration-and-imagery`), and voice/tone (`ux-principles`).
 3. Encode it as guidelines/tokens for consistency (`design-systems`,
-   `design-handoff`); show do/don't and usage.
+   `dev-handoff`); show do/don't and usage.
 4. Apply it to a real touchpoint (a site/artifact via `web-design` +
    `design-to-artifact`) to prove it holds up.
 

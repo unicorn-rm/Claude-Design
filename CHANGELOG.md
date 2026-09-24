@@ -2,6 +2,14 @@
 
 All notable changes to the Claude Design plugin are documented here.
 
+## [0.1.1] — 2026-09-24
+### Changed
+- Renamed two skills to avoid a namespace collision with the built-in `design`
+  department plugin (which also exposes `design:design-critique` and
+  `design:design-handoff`): `design-critique` → **`visual-critique`**,
+  `design-handoff` → **`dev-handoff`**. Namespace (`design:`) and command names
+  are unchanged.
+
 ## [0.1.0] — 2026-09-24
 ### Added
 - Initial full build of the `design` plugin (senior design companion).

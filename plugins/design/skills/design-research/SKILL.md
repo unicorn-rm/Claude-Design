@@ -56,4 +56,4 @@ Drive it via `/design:moodboard`.
 Reviewing research: are references real, linked, and vetted (not generic)? is each
 tied to a specific move to steal? is there a synthesized idea, or just a pile of
 screenshots? Name what's missing. Direction output → `/design:moodboard`; critique
-of a design → `design-critique`.
+of a design → `visual-critique`.

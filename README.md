@@ -99,7 +99,7 @@ claude plugin uninstall design@claude-design
 | **Foundations (6)** | `color-systems`, `typography` *(pairing ref)*, `layout-and-composition`, `design-systems`, `iconography`, `illustration-and-imagery` |
 | **Web / UI (6)** | `web-design` *(section-patterns ref)*, `ui-components` *(libraries ref)*, `responsive-design`, `accessibility`, `ux-principles`, `landing-pages` |
 | **Motion / 3D (4)** | `motion-and-interaction`, `web-3d` *(Three.js/Spline ref)*, `3d-assets-and-shaders`, `generative-and-creative-coding` |
-| **Process (6)** | `design-research` *(sourcing ref)*, `design-critique`, `design-to-artifact`, `brand-identity`, `design-handoff`, `data-visualization` |
+| **Process (6)** | `design-research` *(sourcing ref)*, `visual-critique`, `design-to-artifact`, `brand-identity`, `dev-handoff`, `data-visualization` |
 | **Agents (6)** | `art-director` · `ui-designer` · `design-critic` · `motion-3d-designer` · `brand-designer` · `design-researcher` |
 | **Commands (8)** | `/brief` · `/moodboard` · `/critique` · `/palette` · `/typeset` · `/artifact` · `/design-review` · `/handoff` |
 

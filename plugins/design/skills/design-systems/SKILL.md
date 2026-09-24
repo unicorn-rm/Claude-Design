@@ -55,4 +55,4 @@ waste; a small consistent one is gold.
 Reviewing a system: are decisions tokenized (semantic, not scattered)? primitive vs
 semantic tiers? components consistent in states/naming? dark mode via tokens? is it
 right-sized (used, not speculative)? Name the biggest source of inconsistency.
-Handoff of tokens → `design-handoff`; component sourcing → `ui-components`.
+Handoff of tokens → `dev-handoff`; component sourcing → `ui-components`.

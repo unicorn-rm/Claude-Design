@@ -1,5 +1,5 @@
 ---
-name: design-critique
+name: visual-critique
 description: Senior design critique — reviewing a design, screenshot, or live site and naming exactly why it works or reads as generic/AI-templated, with specific, grounded fixes and real references to steal from. Use to review or critique a design, get feedback on a mockup or site, or diagnose why something feels off or "AI-made".
 when_to_use: Reviewing/critiquing a design, screenshot, mockup, or live site; diagnosing why something looks generic/AI-made or "off"; getting actionable, specific design feedback.
 ---

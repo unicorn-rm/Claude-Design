@@ -44,7 +44,7 @@ palette/type/layout.
 
 Produce the artifact, then hand back the link and a one-line note on the single
 idea and the key choices. For dev handoff instead of an artifact, emit clean
-tokens + components (`design-handoff`).
+tokens + components (`dev-handoff`).
 
 ## Reading it back
 

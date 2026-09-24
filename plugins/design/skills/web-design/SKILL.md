@@ -45,7 +45,7 @@ itself an anti-slop move.
 
 Produce real front-end: semantic HTML + Tailwind (or CSS), real components from
 `ui-components`, tokens from `color-systems`/`typography`. Deliver as a claude.ai
-artifact via `design-to-artifact` or as handoff-ready code (`design-handoff`).
+artifact via `design-to-artifact` or as handoff-ready code (`dev-handoff`).
 
 ## Reading it back
 

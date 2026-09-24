@@ -9,7 +9,7 @@ allowed-tools: Read, WebFetch, Grep, Glob
 
 Target: `$ARGUMENTS` (a file/screenshot, a URL, or a described design; fetch/read it).
 
-Load `design-critique`; measure against `distinctive-design`; ground fixes in
+Load `visual-critique`; measure against `distinctive-design`; ground fixes in
 `design-grounding`.
 
 1. **Intent** — what is this trying to be, and what's its one idea? If none, say so

@@ -25,7 +25,7 @@
 - **Foundations (6):** color-systems, typography, layout-and-composition, design-systems, iconography, illustration-and-imagery.
 - **Web/UI (6):** web-design, ui-components, responsive-design, accessibility, ux-principles, landing-pages.
 - **Motion/3D/creative (4):** motion-and-interaction, web-3d, 3d-assets-and-shaders, generative-and-creative-coding.
-- **Process/delivery (6):** design-research, design-critique, design-to-artifact, brand-identity, design-handoff, data-visualization.
+- **Process/delivery (6):** design-research, visual-critique, design-to-artifact, brand-identity, dev-handoff, data-visualization.
 
 **Итого 24 скилла** (2 backbone + 22 доменных).
 
@@ -46,8 +46,8 @@ Color (Coolors/Colorhunt/Adobe Color/Happy Hues/Khroma/uicolors + Realtime Color
 ## Фазы
 - Ф0: фундамент (2 backbone + refs + /brief + manifest + marketplace + валидатор + NOTICE + LICENSE/README).
 - Ф1 «отличимый лендинг»: web-design + layout-and-composition + color-systems + typography + ui-components + design-to-artifact + `art-director` + /moodboard /artifact /palette /typeset.
-- Ф2 критика+ресёрч+a11y: design-research + design-critique + accessibility + ux-principles + responsive-design + `design-critic`,`design-researcher` + /critique /design-review.
+- Ф2 критика+ресёрч+a11y: design-research + visual-critique + accessibility + ux-principles + responsive-design + `design-critic`,`design-researcher` + /critique /design-review.
 - Ф3 motion+3D: motion-and-interaction + web-3d + 3d-assets-and-shaders + generative-and-creative-coding + `motion-3d-designer`.
-- Ф4 остаток: design-systems + iconography + illustration-and-imagery + landing-pages + brand-identity + data-visualization + design-handoff + `ui-designer`,`brand-designer` + /handoff.
+- Ф4 остаток: design-systems + iconography + illustration-and-imagery + landing-pages + brand-identity + data-visualization + dev-handoff + `ui-designer`,`brand-designer` + /handoff.
 
 **Границы:** владеет дизайн-крафтом + design-to-code/артефактами; полную инженерию → будущий dev/frontend, деплой → devops. Контент авторский, grounded реальными источниками (донора нет).

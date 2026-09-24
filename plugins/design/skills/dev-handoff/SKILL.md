@@ -1,5 +1,5 @@
 ---
-name: design-handoff
+name: dev-handoff
 description: Senior methodology for design-to-development handoff — clean design tokens, documented components and states, specs and redlines, responsive and accessibility notes, and asset export — so developers build the design accurately. Use when preparing a handoff, exporting tokens/specs, documenting components, or translating a design (or Figma) into implementable specs and code.
 when_to_use: Preparing a design-to-dev handoff; exporting design tokens; documenting components/states/specs; responsive + a11y notes; asset export; Figma-to-code or design-to-code specs.
 ---
