@@ -2,6 +2,21 @@
 
 All notable changes to the Claude Design plugin are documented here.
 
+## [0.2.0] — 2026-09-24
+### Changed
+- **Renamed the plugin `design` → `design-studio`** to resolve a namespace
+  collision at the *plugin-name* level: the desktop app ships a built-in `design`
+  plugin (Anthropic) that owns the `design:` namespace, which orphaned this plugin
+  on install. Commands are now `/design-studio:*` and skills `design-studio:*`.
+  The marketplace (`claude-design`) and repository are unchanged.
+  (v0.1.1's skill renames removed name overlaps but could not free the namespace.)
+### Added
+- `distinctive-design`: flagged the *new* AI defaults — "cream + serif display +
+  terracotta" and "near-black + a single acid-green/vermilion" — so warm-paper is
+  no longer treated as automatically distinctive.
+- `typography`: a variable-vs-static weight check (e.g. no `Plex Mono 450`) to stop
+  citing weights a static family doesn't have.
+
 ## [0.1.1] — 2026-09-24
 ### Changed
 - Renamed two skills to avoid a namespace collision with the built-in `design`

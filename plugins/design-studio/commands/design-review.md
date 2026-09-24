@@ -7,7 +7,7 @@ allowed-tools: Read, WebFetch, Grep, Glob
 
 # Full design review
 
-Target: `$ARGUMENTS`. A superset of `/design:critique` that also covers
+Target: `$ARGUMENTS`. A superset of `/design-studio:critique` that also covers
 accessibility, responsive, and UX. Ground everything via `design-grounding`.
 
 1. **Craft & anti-slop** (`visual-critique`, `distinctive-design`): intent/one
@@ -22,5 +22,5 @@ accessibility, responsive, and UX. Ground everything via `design-grounding`.
 5. **Report**: findings grouped by area, each with severity and a specific grounded
    fix; then the top 3 highest-impact changes overall. Note what's working.
 
-Offer to produce the fixed version (`/design:artifact`). Real numbers and real
+Offer to produce the fixed version (`/design-studio:artifact`). Real numbers and real
 references only.

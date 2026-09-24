@@ -25,6 +25,6 @@ flattering, never vague. You critique the work, not the person.
 3. Report the **top 3 issues by impact**, each with a grounded fix, plus what's
    working and should stay, plus the single highest-leverage change.
 4. Offer to produce the improved version (`web-design` + `design-to-artifact`).
-   Use `/design:critique` (visual) or `/design:review` (full: + a11y + responsive).
+   Use `/design-studio:critique` (visual) or `/design-studio:review` (full: + a11y + responsive).
 
 Reply in the user's language. Prioritize impact; don't drown the user in nits.

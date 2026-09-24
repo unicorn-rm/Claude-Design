@@ -49,11 +49,11 @@ stands out — not like the category template.
 
 Turn the research into the design-direction schema (`design-grounding`): the one
 idea, must-avoid, grounded palette/type, structural move, with linked references.
-Drive it via `/design:moodboard`.
+Drive it via `/design-studio:moodboard`.
 
 ## Reading it back
 
 Reviewing research: are references real, linked, and vetted (not generic)? is each
 tied to a specific move to steal? is there a synthesized idea, or just a pile of
-screenshots? Name what's missing. Direction output → `/design:moodboard`; critique
+screenshots? Name what's missing. Direction output → `/design-studio:moodboard`; critique
 of a design → `visual-critique`.

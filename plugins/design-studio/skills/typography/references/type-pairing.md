@@ -29,6 +29,8 @@ Ground every family/weight in a real source (Google/Adobe Fonts); validate the
 - Two similar geometric sans → muddy, no contrast.
 - Random Google Font "because it looked cool" with no relation to the brief.
 - Display used at body sizes (its optical design breaks) or body used huge.
+- Citing a weight a **static** family doesn't have (e.g. `Plex Mono 450`,
+  `Instrument Serif 700`) — verify variable-vs-static and the real weights first.
 
 ## Scale (type-scale.com)
 - base 16–18px; ratio 1.2 (subtle) → 1.333 (dramatic).

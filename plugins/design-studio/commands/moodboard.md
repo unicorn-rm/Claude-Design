@@ -24,7 +24,7 @@ with `distinctive-design`.
 4. **Write it** to `${CLAUDE_PROJECT_DIR}/.design/direction.md` (design-direction
    schema in `design-grounding`), with the reference links.
 5. Summarize the direction and the one idea; offer to build a palette
-   (`/design:palette`), type (`/design:typeset`), or the artifact (`/design:artifact`).
+   (`/design-studio:palette`), type (`/design-studio:typeset`), or the artifact (`/design-studio:artifact`).
 
 Real, linked references only. If a source is blocked, say so and ask for screens —
 don't fabricate what's behind the login.

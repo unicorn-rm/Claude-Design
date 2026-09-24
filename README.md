@@ -77,16 +77,18 @@ on two principles:
 
 ```bash
 claude plugin marketplace add unicorn-rm/Claude-Design
-claude plugin install design@claude-design
+claude plugin install design-studio@claude-design
 ```
 
 Then **start a new Claude Code session** (plugins load at session start).
 
+> The plugin is named **`design-studio`** (its commands are `/design-studio:*`) to avoid a namespace clash with the built-in `design` plugin. The marketplace stays `claude-design`.
+
 ```bash
 # update
-claude plugin marketplace update claude-design && claude plugin install design@claude-design
+claude plugin marketplace update claude-design && claude plugin install design-studio@claude-design
 # remove
-claude plugin uninstall design@claude-design
+claude plugin uninstall design-studio@claude-design
 ```
 
 > In an interactive session you can also use the `/plugin` menu.
@@ -111,21 +113,21 @@ grounded in something real*.
 
 ```text
 # 1. Capture the direction (brand, the one idea, must-avoid, real references)
-/design:brief
+/design-studio:brief
 
 # 2. Build a distinctive direction from real references
-/design:moodboard
+/design-studio:moodboard
 
 # 3. Ground the visual system
-/design:palette      # intentional color + real contrast numbers
-/design:typeset      # real type pairing + scale
+/design-studio:palette      # intentional color + real contrast numbers
+/design-studio:typeset      # real type pairing + scale
 
 # 4. Ship it as a self-contained artifact
-/design:artifact a landing hero
+/design-studio:artifact a landing hero
 
 # 5. Or critique / review an existing design
-/design:critique <file or url>
-/design:design-review <file or url>
+/design-studio:critique <file or url>
+/design-studio:design-review <file or url>
 ```
 
 Or just ask — *"design a hero for a coffee brand"*, *"why does this landing look

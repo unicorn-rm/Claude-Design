@@ -5,9 +5,9 @@
   "owner": { "name": "unicorn-rm", "url": "https://github.com/unicorn-rm" },
   "plugins": [
     {
-      "name": "design",
+      "name": "design-studio",
       "description": "Senior design companion across color, type, layout, UI, motion, 3D, and brand. Distinctive by default, grounded in real curated references, ships real front-end and artifacts.",
-      "source": "./plugins/design"
+      "source": "./plugins/design-studio"
     }
   ]
 }

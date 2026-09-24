@@ -37,6 +37,11 @@ in [ai-design-tells](references/ai-design-tells.md).
 - **Meaningless motion:** everything fades-up-on-scroll with the same easing.
 - **No point of view:** nothing is exaggerated, nothing is restrained, nothing
   is a choice. Safe. Forgettable.
+- **Yesterday's escape, now a default.** The "tasteful" cluster —
+  cream/warm-off-white + a high-contrast serif display + a terracotta accent — and
+  its dark twin — near-black + a single acid-green/electric-lime/vermilion accent —
+  have themselves become AI defaults. Warm paper is no longer automatically
+  distinctive. The win is **intentionality for this brand**, not a palette recipe.
 
 ## The moves that defeat them
 
@@ -47,7 +52,9 @@ in [ai-design-tells](references/ai-design-tells.md).
    See `typography`. Avoid one-weight Inter walls.
 3. **Intentional color, not default.** A warm off-white beats `#ffffff`; a
    specific accent beats blurple. Ground it in real palettes (`color-systems`).
-   Restrain the palette — 2–3 real colors, used with intent.
+   Restrain the palette — 2–3 real colors, used with intent. But note: warm
+   cream + serif + terracotta is now a default too — the point is a choice made
+   *for this brand*, not a recipe you reach for every time.
 4. **Editorial / asymmetric layout.** Break the center. Use a real grid, uneven
    columns, overlap, generous *and* tight space deliberately. Whitespace is a
    material, not a leftover. See `layout-and-composition`.

@@ -39,6 +39,12 @@ weights actually exist — see [type-pairing](references/type-pairing.md)).
 
 - Prefer variable fonts for weight range + performance (one file). Inspect real
   axes with Wakamai Fondue before assuming an axis exists.
+- **Variable vs static — verify the weight exists.** A static family ships only
+  fixed weights (e.g. IBM Plex Mono has 100/200/300/400/500/600/700 — there is no
+  `450`); only a *variable* family has a continuous range. Asking for a weight a
+  static family lacks silently falls back to the nearest — a common way to "invent"
+  a weight. Confirm the family is variable (and the axis range) via the real
+  registry / Wakamai Fondue before citing a non-standard weight.
 - **Optical sizing** (`opsz`) where available; tighten letter-spacing on large
   display, leave body alone. Hanging punctuation and optical alignment (`text-
   wrap: balance/pretty`) are the small senior corrections.

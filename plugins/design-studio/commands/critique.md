@@ -22,7 +22,7 @@ Load `visual-critique`; measure against `distinctive-design`; ground fixes in
 4. **Top 3 issues by impact** — each: what → why it hurts → specific fix → a real
    reference to steal from where useful. Then **what's working** (keep it), and the
    **single highest-leverage change**.
-5. Offer to build the improved version (`/design:artifact`).
+5. Offer to build the improved version (`/design-studio:artifact`).
 
 Specific and grounded only — never "make it more modern", never invent a hex/font/
-ratio. For a full review incl. accessibility + responsive, use `/design:review`.
+ratio. For a full review incl. accessibility + responsive, use `/design-studio:review`.

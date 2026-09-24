@@ -11,7 +11,7 @@ Target: `$ARGUMENTS`. Load `design-to-artifact`; hold `distinctive-design` and
 `design-grounding` throughout.
 
 1. **Source of truth:** use `.design/direction.md` (palette/type/layout/one idea)
-   if present; else derive a quick direction first (`/design:brief` or `/design:moodboard`).
+   if present; else derive a quick direction first (`/design-studio:brief` or `/design-studio:moodboard`).
 2. If Artifact design/capabilities skills exist in the environment, load them first
    (design calibration; runtime capabilities only if the page needs state/data).
 3. **Build it distinctive in real code:** real type (linked/self-hosted) at real
@@ -24,6 +24,6 @@ Target: `$ARGUMENTS`. Load `design-to-artifact`; hold `distinctive-design` and
    (`distinctive-design` → ai-design-tells), verify contrast with real numbers,
    confirm responsiveness. Fix issues in the code.
 5. **Deliver** the artifact and hand back the link + the one idea + the key
-   choices. For dev handoff instead, emit tokens + components (`/design:handoff`).
+   choices. For dev handoff instead, emit tokens + components (`/design-studio:handoff`).
 
 Ground every font/component/class in a real source; never invent an API or a hex.

@@ -1,4 +1,4 @@
-# design — plugin
+# design-studio — plugin
 
 Senior design companion for Claude Code. Distinctive by default (anti-AI-slop) and
 grounded in real curated references. Ships real front-end and claude.ai artifacts.

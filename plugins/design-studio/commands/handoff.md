@@ -25,4 +25,4 @@ Target: `$ARGUMENTS`. Load `dev-handoff`; ground token/component formats via
 6. Output a clean handoff doc/tokens a developer can build from without guessing.
 
 Real values and real ratios only — never invent a token or a contrast number. If
-shipping code directly, the handoff is the code (`/design:artifact`).
+shipping code directly, the handoff is the code (`/design-studio:artifact`).

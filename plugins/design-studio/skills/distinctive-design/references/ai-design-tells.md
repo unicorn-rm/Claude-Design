@@ -59,6 +59,19 @@ specific fix. Ground fixes in real references (`design-grounding`).
   stance and push one idea. If you can't name the idea in a sentence, there isn't
   one yet.
 
+## The new defaults (yesterday's escape is today's cliché)
+The moves that once read as "designed" have been absorbed into the average:
+- **Cream/warm off-white + high-contrast serif display + terracotta accent** — the
+  "editorial warm" cluster. Now a default, including in this plugin's own early
+  work. Use it only if it's genuinely right for *this* brand, not by reflex.
+- **Near-black + a single acid-green / electric-lime / vermilion accent** — the
+  "dark technical" cluster. Same story.
+- **Bento grids, oversized single-weight display, one big number per card** — were
+  fresh, now templated.
+→ Fix: the escape from a default is never another default. Decide from the brief
+and real references (`design-grounding`); if you can't say *why this palette for
+this brand*, it's a reflex, not a choice.
+
 ## How to use this
 1. Generate/receive a design. 2. Walk the list; mark every tell present. 3. For
 each, apply the fix with a **real reference** to steal from (not "make it modern").

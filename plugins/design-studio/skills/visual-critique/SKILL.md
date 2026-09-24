@@ -41,6 +41,6 @@ references (`design-grounding`) and measured against the anti-slop doctrine
 ## Reading it back / output
 
 Deliver: intent, tells present, top issues (with grounded fixes + references),
-what's working, and the single highest-leverage change. Drive via `/design:critique`
-or a full `/design:review` (adds a11y + responsive). Turning fixes into a new
+what's working, and the single highest-leverage change. Drive via `/design-studio:critique`
+or a full `/design-studio:review` (adds a11y + responsive). Turning fixes into a new
 version → `web-design` + `design-to-artifact`.

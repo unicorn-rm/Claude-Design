@@ -5,7 +5,7 @@ import json, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PLUGIN = ROOT / "plugins" / "design"
+PLUGIN = ROOT / "plugins" / "design-studio"
 DESC_CAP = 1536
 
 def parse_frontmatter(text):

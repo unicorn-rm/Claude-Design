@@ -25,6 +25,6 @@ learning from and turn it into a point of view — not a pile of pretty screensh
    type contrast, color, rhythm) — not "the vibe". Note the category clichés to avoid.
 4. Synthesize into the design-direction schema (`design-research`,
    `design-grounding`): one idea, must-avoid, grounded palette/type, structural
-   move, linked references. Deliver via `/design:moodboard`.
+   move, linked references. Deliver via `/design-studio:moodboard`.
 
 Reply in the user's language. Few strong references beat many weak ones.

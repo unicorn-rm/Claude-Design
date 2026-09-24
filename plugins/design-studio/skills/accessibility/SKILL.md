@@ -50,4 +50,4 @@ contrast greys, decorative-only cues) are accessibility failures too.
 Reviewing a11y: real contrast numbers reported and passing? keyboard-operable with
 visible focus? semantic structure + correct labels? meaning not color-only? reduced
 motion respected? Name failures with the exact fix and number. Part of a full
-`/design:review`; ties into `color-systems` (contrast) and `ux-principles`.
+`/design-studio:review`; ties into `color-systems` (contrast) and `ux-principles`.
