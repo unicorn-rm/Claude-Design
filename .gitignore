@@ -1,0 +1,10 @@
+# Runtime state written by the plugin into a consuming project
+.design/
+
+# Eval run outputs
+**/evals/**/results/
+results/
+
+# OS / editor cruft
+.DS_Store
+*.swp

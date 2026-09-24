@@ -1,0 +1,13 @@
+{
+  "name": "claude-design",
+  "displayName": "Claude Design",
+  "description": "Full-spectrum senior design plugin for Claude Code — color, type, layout, UI, motion, 3D, brand. Distinctive, non-AI-slop design grounded in real references. Ships real front-end and artifacts.",
+  "owner": { "name": "unicorn-rm", "url": "https://github.com/unicorn-rm" },
+  "plugins": [
+    {
+      "name": "design",
+      "description": "Senior design companion across color, type, layout, UI, motion, 3D, and brand. Distinctive by default, grounded in real curated references, ships real front-end and artifacts.",
+      "source": "./plugins/design"
+    }
+  ]
+}

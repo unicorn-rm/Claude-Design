@@ -1,0 +1,10 @@
+{
+  "name": "design",
+  "displayName": "Design — Senior Design Companion",
+  "version": "0.1.0",
+  "description": "Full-spectrum senior design companion for Claude Code: color, typography, layout, UI, motion, 3D, brand, and design-to-artifact. Makes distinctive, non-AI-slop design grounded in real curated references (awwwards, Typewolf, Mobbin, shadcn, Three.js, GitHub) and real specs. Ships real front-end and claude.ai artifacts.",
+  "author": { "name": "unicorn-rm" },
+  "license": "MIT",
+  "keywords": ["design", "ui", "ux", "web-design", "typography", "color", "3d", "branding", "frontend", "artifacts"],
+  "experimental": { "evals": "./evals/" }
+}
