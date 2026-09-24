@@ -22,6 +22,7 @@ Distinctive by default, not AI-slop. Grounded in real references. Ships real fro
 
 - [What is this](#what-is-this)
 - [Why it's different](#why-its-different)
+- [Showcase](#showcase)
 - [Install](#install)
 - [The `design` plugin](#the-design-plugin)
 - [Quick start](#quick-start)
@@ -72,6 +73,21 @@ on two principles:
 
 3. **🎓 Teaches the eye.** Every skill can explain *why* a choice reads generic vs
    intentional, with a concrete before/after — so you build taste, not just output.
+
+## Showcase
+
+Two pieces built end-to-end by the `design-studio` plugin — deliberately opposite
+registers, to show it designs to the brief instead of defaulting to one house style.
+Every font is verified against the live Google Fonts registry, every colour pair
+passes WCAG (36/36), and both were rendered in light + dark at 1280 and 375px with
+the anti-slop pass applied to the actual pixels.
+
+| Ember — self-hosted analytics dashboard | Marrowbone Press — publisher landing |
+|---|---|
+| ![Ember dashboard, dark](examples/screenshots/ember-dark-1280.png) | ![Marrowbone Press landing, light](examples/screenshots/marrowbone-light-1280.png) |
+| *An instrument panel, not a marketing dashboard — hairlines, tabular figures, one hot accent reserved for the live signal.* | *Set like the title page of a book it sells — cold grey-green paper (not cream), Bodoni Moda display.* |
+
+**→ [Browse the full showcase with all screenshots and design notes](examples/README.md)**
 
 ## Install
 

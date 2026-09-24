@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marrowbone Press — field guides, four a year</title>
+<meta name="description" content="Marrowbone Press prints four field guides a year in Bristol. Letterpress wrappers, Smyth-sewn, editions of 1 200.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Grounded 2026-09-24 against fonts.google.com/metadata/fonts:
+     Bodoni Moda     — variable, wght 400–900 (no lighter weight exists), opsz 6–96
+     Instrument Sans — variable, wght 400–700 (no 300), wdth 75–100 -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   MARROWBONE PRESS — design tokens
+   One idea: the page is the title page of the book it sells.
+   Square corners, hard register shadows, rules that actually rule.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  /* LIGHT is the designed default — this is paper. Cool grey-green, not cream. */
+  --paper:#EFF1ED;
+  --card:#F7F8F5;
+  --ink:#101311;        /* 16.45:1 on --paper */
+  --ink-2:#4A514B;      /*  7.19:1 */
+  --ink-3:#5E6660;      /*  5.21:1 */
+  --accent:#1C4B3C;     /*  8.71:1 — bottle green */
+  --on-accent:#EFF1ED;  /*  8.71:1 on --accent */
+  --ochre:#D9A441;      /* fill only; ink on it = 8.31:1 */
+  --ochre-ink:#7A5310;  /*  6.01:1 as text on --paper */
+  --rule:rgba(16,19,17,.22);
+  --rule-fine:rgba(16,19,17,.13);
+  --register:rgba(16,19,17,.85);   /* hard offset "shadow" = print register */
+  --grain:.05; --grain-blend:multiply;
+
+  --ff-display:'Bodoni Moda','Didot','Times New Roman',serif;
+  --ff-text:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+
+  --t-micro:11px; --t-sm:13.5px; --t-base:17px; --t-lead:20px;
+  --t-h2:clamp(1.75rem,3.6vw,2.9rem);
+  --t-display:clamp(3rem,10.2vw,7.25rem); --lh-display:1.04;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px;
+  --sp-6:32px; --sp-8:48px; --sp-10:72px; --sp-12:104px;
+
+  --gut:clamp(20px,5vw,72px);
+  --max:1240px;
+  --ease:cubic-bezier(.16,.84,.28,1);   /* the ONE curve */
+}
+/* Dark — drawn, not inverted. The ground becomes a pressroom at night:
+   green-black, ink warms to bone, the bottle green lifts to sage so it
+   stops disappearing, and the ochre stays because it still carries. */
+:root[data-theme="dark"]{
+  --paper:#0D110F; --card:#141A17;
+  --ink:#E7E8E2;        /* 15.43:1 on --paper */
+  --ink-2:#A2A79F;      /*  7.76:1 */
+  --ink-3:#8B918A;      /*  5.90:1 */
+  --accent:#8ECBB0;     /* 10.25:1 */
+  --on-accent:#0D110F;  /* 10.25:1 on --accent */
+  --ochre:#D9A441;      /*  8.46:1 as text here */
+  --ochre-ink:#D9A441;
+  --rule:rgba(231,232,226,.24);
+  --rule-fine:rgba(231,232,226,.13);
+  --register:rgba(231,232,226,.7);
+  --grain:.045; --grain-blend:overlay;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D110F; --card:#141A17;
+    --ink:#E7E8E2; --ink-2:#A2A79F; --ink-3:#8B918A;
+    --accent:#8ECBB0; --on-accent:#0D110F;
+    --ochre:#D9A441; --ochre-ink:#D9A441;
+    --rule:rgba(231,232,226,.24); --rule-fine:rgba(231,232,226,.13);
+    --register:rgba(231,232,226,.7); --grain:.045; --grain-blend:overlay;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--ff-text); font-size:var(--t-base); line-height:1.6;
+  font-variation-settings:'wdth' 100,'wght' 400;
+  -webkit-font-smoothing:antialiased;
+  hanging-punctuation:first allow-end;
+}
+body::after{           /* paper grain — material depth, no blur anywhere */
+  content:""; position:fixed; inset:0; z-index:99; pointer-events:none;
+  opacity:var(--grain); mix-blend-mode:var(--grain-blend);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+:where(a,button,input,summary,[tabindex]):focus-visible{
+  outline:2px solid var(--accent); outline-offset:3px;
+}
+svg[hidden]{display:none}
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip{position:absolute;left:var(--gut);top:-64px;z-index:100;background:var(--ink);color:var(--paper);padding:12px 18px;font-weight:600;transition:top 200ms var(--ease)}
+.skip:focus{top:12px}
+
+.wrap{max-width:var(--max); margin-inline:auto; padding-inline:var(--gut)}
+.micro{
+  font-size:var(--t-micro); text-transform:uppercase; letter-spacing:.2em;
+  font-variation-settings:'wdth' 88,'wght' 600; color:var(--ink-3);
+}
+
+/* ── masthead ───────────────────────────────────────────────────── */
+.mast{position:relative}
+.mast::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--ink);transform-origin:left center}
+.mast .wrap{
+  display:flex; align-items:center; gap:var(--sp-5);
+  min-height:64px; flex-wrap:wrap; padding-block:var(--sp-3);
+}
+.mast .name{
+  display:inline-flex; align-items:center; min-height:44px;
+  font-family:var(--ff-display); font-size:20px;
+  font-variation-settings:'opsz' 22,'wght' 700; letter-spacing:.01em;
+  text-decoration:none; color:var(--ink); white-space:nowrap;
+}
+.mast nav{margin-left:auto; display:flex; gap:var(--sp-1); flex-wrap:wrap}
+.mast nav a{
+  display:inline-flex; align-items:center; min-height:44px; padding:0 12px;
+  color:var(--ink-2); text-decoration:none; font-size:var(--t-sm);
+  font-variation-settings:'wdth' 92,'wght' 500; position:relative;
+}
+.mast nav a::after{
+  content:""; position:absolute; left:12px; right:12px; bottom:12px; height:1px;
+  background:var(--ink); transform:scaleX(0); transform-origin:left;
+  transition:transform 260ms var(--ease);
+}
+.mast nav a:hover{color:var(--ink)}
+.mast nav a:hover::after{transform:scaleX(1)}
+.themebtn{
+  appearance:none; border:1px solid var(--rule); background:transparent; color:var(--ink);
+  min-height:44px; min-width:44px; cursor:pointer; margin-left:var(--sp-2);
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:background 200ms var(--ease);
+}
+.themebtn:hover{background:var(--card)}
+
+/* ── hero: an actual title page ─────────────────────────────────── */
+.hero{padding-block:clamp(40px,7vw,86px) 0; position:relative}
+.hero .wrap{
+  display:grid; grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:var(--sp-5) var(--sp-5); align-items:start;
+}
+.hero-kicker{grid-column:1/-1; display:flex; gap:var(--sp-4); align-items:baseline; flex-wrap:wrap}
+.hero-kicker .no{color:var(--ochre-ink); font-variation-settings:'wdth' 88,'wght' 700}
+.hero-title{grid-column:1/9; margin:var(--sp-5) 0 0}
+.hero-title .l{
+  display:block; font-family:var(--ff-display);
+  font-size:var(--t-display); line-height:var(--lh-display); letter-spacing:-.021em;
+  font-variation-settings:'opsz' 96,'wght' 500;
+  text-wrap:balance;
+}
+.hero-title .l2{
+  font-variation-settings:'opsz' 96,'wght' 800;
+  margin-left:clamp(0px,4.5vw,84px);   /* the title-page indent — grid broken on purpose */
+}
+.hero-title em{
+  font-style:italic; font-variation-settings:'opsz' 96,'wght' 500;
+}
+.hero-by{
+  grid-column:1/9; margin:var(--sp-5) 0 0;
+  font-family:var(--ff-display); font-size:clamp(1.05rem,1.9vw,1.4rem);
+  font-variation-settings:'opsz' 18,'wght' 400; color:var(--ink-2); font-style:italic;
+}
+.hero-rail{grid-column:9/13; grid-row:2/5; align-self:start; margin-top:var(--sp-5)}
+.hero-side{border-top:2px solid var(--ink); padding-top:var(--sp-4)}
+.hero-side p{margin:var(--sp-3) 0 0; font-size:var(--t-sm); line-height:1.65; color:var(--ink-2); text-wrap:pretty}
+.hero-side p strong{color:var(--ink); font-variation-settings:'wdth' 100,'wght' 700}
+.hero-cta{margin-top:var(--sp-5); display:flex; flex-direction:column; gap:var(--sp-3); align-items:flex-start}
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  min-height:52px; padding:0 26px; cursor:pointer;
+  font:inherit; font-size:var(--t-sm); letter-spacing:.09em; text-transform:uppercase;
+  font-variation-settings:'wdth' 92,'wght' 700;
+  border:1px solid var(--ink); border-radius:0;          /* square. never rounded-2xl */
+  background:var(--accent); color:var(--on-accent); text-decoration:none;
+  box-shadow:4px 4px 0 var(--register);                   /* hard register, not a soft blur */
+  transition:transform 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+.btn:hover{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--register)}
+.btn:active{transform:translate(4px,4px); box-shadow:0 0 0 var(--register)}
+.btn--ghost{background:transparent; color:var(--ink); box-shadow:none}
+.btn--ghost:hover{background:var(--card); transform:none}
+.hero-cta small{font-size:var(--t-micro); color:var(--ink-3); letter-spacing:.04em}
+
+/* the object: a cover, drawn */
+.plate{
+  margin:var(--sp-8) 0 0 auto; width:min(100%,252px); max-width:100%;
+  aspect-ratio:128/190; position:relative;
+  transform:rotate(-1.4deg);
+  background:var(--card); border:1px solid var(--ink);
+  box-shadow:10px 12px 0 var(--rule-fine), 0 0 0 1px var(--rule-fine);
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:26px 22px 20px 34px;
+}
+.plate::before{        /* the spine */
+  content:""; position:absolute; left:0; top:0; bottom:0; width:12px; background:var(--accent);
+  border-right:1px solid var(--ink);
+}
+.plate::after{         /* the blind-stamped inner frame */
+  content:""; position:absolute; inset:9px 9px 9px 21px; border:1px solid var(--rule);
+}
+.plate .pt{
+  font-family:var(--ff-display); font-size:clamp(17px,2.1vw,23px); line-height:1.08;
+  font-variation-settings:'opsz' 28,'wght' 700; position:relative; z-index:1;
+}
+.plate .pa{position:relative; z-index:1; margin:14px 0 auto; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-2); font-variation-settings:'wdth' 88,'wght' 500}
+.plate .pm{position:relative; z-index:1}
+.plate .pm span{display:block; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3); font-variation-settings:'wdth' 86,'wght' 600}
+
+.bleed-rule{margin-top:clamp(40px,6vw,80px); border-top:1px solid var(--ink)}
+.bleed-rule .wrap{display:flex; justify-content:space-between; gap:var(--sp-4); padding-block:10px; flex-wrap:wrap}
+
+/* ── the spread ─────────────────────────────────────────────────── */
+.spread{padding-block:clamp(48px,7vw,var(--sp-12))}
+.spread .wrap{display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:var(--sp-5)}
+h2{
+  font-family:var(--ff-display); font-size:var(--t-h2); line-height:1.06;
+  font-variation-settings:'opsz' 44,'wght' 700; letter-spacing:-.015em;
+  margin:0 0 var(--sp-5); text-wrap:balance;
+}
+.col-lead{grid-column:1/7}
+.col-lead p{margin:0 0 var(--sp-4); max-width:58ch; text-wrap:pretty}
+.col-lead p:first-of-type::first-letter{
+  float:left; font-family:var(--ff-display); font-size:4.15em; line-height:.82;
+  font-variation-settings:'opsz' 72,'wght' 700;
+  padding:.06em .1em 0 0; margin-right:.02em;
+}
+.col-aside{grid-column:8/13}
+.pull{
+  margin:0 0 var(--sp-6); padding:var(--sp-5) 0; border-block:1px solid var(--ink);
+  font-family:var(--ff-display); font-size:clamp(1.15rem,2.1vw,1.6rem); line-height:1.24;
+  font-variation-settings:'opsz' 32,'wght' 500; font-style:italic; text-wrap:pretty;
+}
+.pull cite{
+  display:block; margin-top:var(--sp-3); font-family:var(--ff-text); font-style:normal;
+  font-size:var(--t-micro); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink-3); font-variation-settings:'wdth' 88,'wght' 600;
+}
+dl.specs{margin:0}
+dl.specs > div{display:flex; align-items:baseline; gap:.6ch; padding-block:9px; font-size:var(--t-sm)}
+dl.specs dt{display:flex; align-items:baseline; gap:.6ch; flex:1; color:var(--ink-3); white-space:nowrap}
+dl.specs dt::after{content:""; flex:1; border-bottom:1px dotted var(--rule); margin-bottom:.3em}
+dl.specs dd{margin:0; color:var(--ink); font-variation-settings:'wdth' 96,'wght' 600; text-align:right}
+
+/* ── backlist: a publisher's list, not three feature cards ──────── */
+.list{padding-block:0 clamp(48px,7vw,var(--sp-12))}
+.list .wrap > header{display:flex; align-items:baseline; gap:var(--sp-4); flex-wrap:wrap; margin-bottom:var(--sp-5)}
+.list h2{margin:0}
+.list .count{margin-left:auto}
+.tcap{margin:0 0 var(--sp-4); font-size:var(--t-sm); color:var(--ink-3)}
+.tw{overflow-x:auto}
+.tw:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+table{width:100%; border-collapse:collapse; min-width:600px}
+caption{text-align:left; font-size:var(--t-sm); color:var(--ink-3); padding-bottom:var(--sp-4)}
+th{
+  text-align:left; font-size:var(--t-micro); text-transform:uppercase; letter-spacing:.18em;
+  color:var(--ink-3); font-variation-settings:'wdth' 88,'wght' 600;
+  border-bottom:1px solid var(--ink); padding:0 var(--sp-4) 10px 0;
+}
+td{border-bottom:1px solid var(--rule-fine); padding:var(--sp-4) var(--sp-4) var(--sp-4) 0; vertical-align:baseline}
+tbody tr{transition:background 200ms var(--ease)}
+tbody tr:hover{background:var(--card)}
+td.yr{font-size:var(--t-sm); color:var(--ink-3); font-variant-numeric:tabular-nums; width:1%; white-space:nowrap}
+td.ti{font-family:var(--ff-display); font-size:clamp(1.05rem,1.8vw,1.35rem); font-variation-settings:'opsz' 24,'wght' 600; line-height:1.2}
+td.au{font-size:var(--t-sm); color:var(--ink-2); font-style:italic}
+td.st{width:1%; white-space:nowrap; text-align:right}
+/* status never rides on colour alone: mark + word */
+.tag{display:inline-flex; align-items:center; gap:7px; font-size:var(--t-micro); letter-spacing:.12em; text-transform:uppercase; font-variation-settings:'wdth' 88,'wght' 600}
+.tag::before{content:""; width:8px; height:8px; flex:none; border:1px solid currentColor}
+.tag--in{color:var(--accent)} .tag--in::before{background:currentColor}
+.tag--2nd{color:var(--ochre-ink)} .tag--2nd::before{background:linear-gradient(135deg,currentColor 0 50%,transparent 50% 100%)}
+.tag--out{color:var(--ink-3)}
+
+/* ── the offer ──────────────────────────────────────────────────── */
+.offer{padding-block:0 clamp(48px,7vw,var(--sp-12))}
+.offer .wrap{display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:var(--sp-5)}
+.offer .box{
+  grid-column:2/9;                         /* deliberately off-centre */
+  border:1px solid var(--ink); background:var(--card);
+  box-shadow:8px 8px 0 var(--ochre);
+  padding:clamp(24px,4vw,44px);
+}
+.offer h2{margin-bottom:var(--sp-3)}
+.offer p{margin:0 0 var(--sp-5); max-width:52ch; color:var(--ink-2); text-wrap:pretty}
+.offer .price{
+  font-family:var(--ff-display); font-size:clamp(2.2rem,5vw,3.4rem); line-height:1;
+  font-variation-settings:'opsz' 60,'wght' 700; font-variant-numeric:tabular-nums;
+}
+.offer .price small{font-family:var(--ff-text); font-size:var(--t-sm); color:var(--ink-3); letter-spacing:.04em; font-variation-settings:'wdth' 92,'wght' 500; margin-left:10px}
+.offer .row{display:flex; gap:var(--sp-4); align-items:center; flex-wrap:wrap; margin-top:var(--sp-5)}
+.offer .fine{grid-column:10/13; font-size:var(--t-micro); line-height:1.8; color:var(--ink-3); align-self:end; padding-bottom:var(--sp-3)}
+
+/* ── colophon ───────────────────────────────────────────────────── */
+.colophon{border-top:1px solid var(--ink); padding-block:var(--sp-6) var(--sp-8)}
+.colophon .wrap{display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:var(--sp-5)}
+.colophon .c1{grid-column:1/5} .colophon .c2{grid-column:6/9} .colophon .c3{grid-column:10/13}
+.colophon h3{margin:0 0 var(--sp-3); font-size:var(--t-micro); text-transform:uppercase; letter-spacing:.2em; color:var(--ink-3); font-variation-settings:'wdth' 88,'wght' 600}
+.colophon p,.colophon ul{margin:0; font-size:var(--t-sm); color:var(--ink-2); line-height:1.75}
+.colophon ul{list-style:none; padding:0}
+.colophon ul a{display:inline-flex; align-items:center; min-height:44px}
+.colophon a{color:var(--ink-2); text-underline-offset:3px}
+.colophon a:hover{color:var(--ink)}
+
+/* ── THE one motion: the page sets itself.
+      Rules draw first (they define the page), then the type lands. ── */
+@keyframes rule-in{from{transform:scaleX(0)} to{transform:scaleX(1)}}
+@keyframes set-in{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
+.mast::after{animation:rule-in 620ms var(--ease) both}
+.hero-kicker{animation:set-in 560ms var(--ease) 140ms both}
+.hero-title .l1{animation:set-in 700ms var(--ease) 220ms both}
+.hero-title .l2{animation:set-in 700ms var(--ease) 300ms both}
+.hero-by{animation:set-in 700ms var(--ease) 380ms both}
+.hero-side{animation:set-in 700ms var(--ease) 440ms both}
+.plate{animation:set-in 760ms var(--ease) 520ms both}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition-duration:.001ms !important}
+  .btn:hover{transform:none}
+}
+
+/* ── responsive: recomposed, not squeezed ───────────────────────── */
+@media (max-width:1000px){
+  .hero-title,.hero-by{grid-column:1/9}
+  .hero-rail{grid-column:9/13; grid-row:2/5}
+  .col-lead{grid-column:1/8} .col-aside{grid-column:8/13}
+  .offer .box{grid-column:1/10} .offer .fine{grid-column:10/13}
+  .colophon .c1{grid-column:1/6} .colophon .c2{grid-column:6/10} .colophon .c3{grid-column:10/13}
+}
+@media (max-width:760px){
+  .hero-title,.hero-by,.hero-rail{grid-column:1/-1; grid-row:auto}
+  .hero-rail{margin-top:var(--sp-6)}
+  .plate{margin:var(--sp-6) auto 0 0; width:min(72%,220px)}
+  .col-lead,.col-aside{grid-column:1/-1}
+  .col-aside{margin-top:var(--sp-6)}
+  .offer .box,.offer .fine{grid-column:1/-1}
+  .offer .fine{padding-bottom:0}
+  .colophon .c1,.colophon .c2,.colophon .c3{grid-column:1/-1}
+  table{min-width:0}
+  .list thead{display:none}
+  .list tbody tr{display:grid; grid-template-columns:auto minmax(0,1fr); gap:2px var(--sp-4); padding-block:var(--sp-4); border-bottom:1px solid var(--rule-fine)}
+  .list td{border:0; padding:0}
+  .list td.yr{grid-column:1; grid-row:1}
+  .list td.ti{grid-column:2; grid-row:1}
+  .list td.au{grid-column:2; grid-row:2}
+  .list td.st{grid-column:2; grid-row:3; width:auto; text-align:left; padding-top:6px}
+  .mast nav{margin-left:0; width:100%; order:3}
+  .mast nav a{padding-inline:0; margin-right:var(--sp-4)}
+  .mast nav a::after{left:0; right:var(--sp-4)}
+  .hero-title .l2{margin-left:clamp(0px,6vw,40px)}
+}
+@media (max-width:420px){
+  .plate{width:100%; margin-inline:0}
+  .hero-title .l2{margin-left:0}
+  dl.specs > div{flex-wrap:wrap}
+  dl.specs dd{text-align:left}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="mast">
+  <div class="wrap">
+    <a class="name" href="#main">Marrowbone&nbsp;Press</a>
+    <nav aria-label="Primary">
+      <a href="#current">The new book</a>
+      <a href="#backlist">List</a>
+      <a href="#subscribe">Subscribe</a>
+      <a href="#colophon">About the press</a>
+    </nav>
+    <button class="themebtn" type="button" id="theme" aria-label="Switch to dark theme">
+      <svg class="i-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+        <path d="M20.2 14.3A8.4 8.4 0 0 1 9.7 3.8a8.4 8.4 0 1 0 10.5 10.5Z"/>
+      </svg>
+      <svg class="i-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true" hidden>
+        <circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ── hero, set as a title page ─────────────────────────────── -->
+  <section class="hero" aria-labelledby="t">
+    <div class="wrap">
+      <p class="hero-kicker micro">
+        <span class="no">Series No. 14</span>
+        <span>October 2026</span>
+        <span>Edition of 1 200</span>
+      </p>
+
+      <h1 class="hero-title" id="t">
+        <span class="l l1">A Field Guide to</span>
+        <span class="l l2"><em>Standing</em> Water</span>
+      </h1>
+      <p class="hero-by">by Nell Aitcheson · with 41 plates drawn from life</p>
+
+      <div class="hero-rail">
+      <div class="hero-side">
+        <p class="micro">What this is</p>
+        <p><strong>Marrowbone Press prints four field guides a year</strong> — letterpress wrappers, Smyth-sewn, set by hand in Bristol. No reprints on demand. When an edition is gone it stays gone.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#subscribe">Take the four&nbsp;books</a>
+          <small>£68 a year · posted the week they leave the bindery</small>
+        </div>
+      </div>
+
+      <div class="plate" aria-hidden="true">
+        <div class="pt">A Field&nbsp;Guide<br>to <em>Standing</em><br>Water</div>
+        <div class="pa">Nell Aitcheson</div>
+        <div class="pm"><span>Marrowbone · xiv</span></div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bleed-rule">
+    <div class="wrap">
+      <span class="micro">Bristol · established 2019</span>
+      <span class="micro">Fourteen books · nine still in print</span>
+    </div>
+  </div>
+
+  <!-- ── the spread: what the book actually is ─────────────────── -->
+  <section class="spread" id="current" aria-labelledby="h-cur">
+    <div class="wrap">
+      <div class="col-lead">
+        <h2 id="h-cur">Ponds, ditches, flooded quarries, and the things that only live in them</h2>
+        <p>Nell Aitcheson spent six years walking the same eleven bodies of standing water in the Mendips, most of them small enough to miss from a road. This is what she found: 218 species, 41 plates drawn at the water's edge, and a method for reading a pond that takes about twenty minutes and no equipment.</p>
+        <p>It is a working book. The paper takes pencil, the binding opens flat on a knee, and the wrappers are printed letterpress so they wear in rather than out. We made 1 200 and that is all there will be.</p>
+        <p>Printed in September at Rathbone &amp; Slee, Frome. Bound by hand in Bristol over three weeks.</p>
+      </div>
+
+      <div class="col-aside">
+        <blockquote class="pull">
+          “A pond is not a small lake. It is a different argument entirely, and it is usually winning.”
+          <cite>Nell Aitcheson, p. 31</cite>
+        </blockquote>
+        <dl class="specs">
+          <div><dt>Format</dt><dd>190 × 128 mm</dd></div>
+          <div><dt>Extent</dt><dd>224 pages</dd></div>
+          <div><dt>Paper</dt><dd>Munken Pure 120 gsm</dd></div>
+          <div><dt>Binding</dt><dd>Smyth-sewn, flat-opening</dd></div>
+          <div><dt>Wrappers</dt><dd>Letterpress, 2 colours</dd></div>
+          <div><dt>Edition</dt><dd>1 200 numbered</dd></div>
+          <div><dt>Ships</dt><dd>14 October 2026</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the list ──────────────────────────────────────────────── -->
+  <section class="list" id="backlist" aria-labelledby="h-list">
+    <div class="wrap">
+      <header>
+        <h2 id="h-list">The list</h2>
+        <span class="count micro">Fourteen titles since 2019</span>
+      </header>
+      <p class="tcap">Marrowbone Press titles, most recent first. Out-of-print editions are not reprinted.</p>
+      <div class="tw" tabindex="0" role="region" aria-label="List of titles">
+        <table>
+          <caption class="vh">Marrowbone Press titles, most recent first.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Year</th>
+              <th scope="col">Title</th>
+              <th scope="col">Author</th>
+              <th scope="col" style="text-align:right">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="yr">2026</td><td class="ti">A Field Guide to Standing Water</td><td class="au">Nell Aitcheson</td><td class="st"><span class="tag tag--in">In print</span></td></tr>
+            <tr><td class="yr">2025</td><td class="ti">Nightjar Country</td><td class="au">Owen Vale</td><td class="st"><span class="tag tag--2nd">Second printing</span></td></tr>
+            <tr><td class="yr">2025</td><td class="ti">The Salt Line</td><td class="au">Mira Thorsen</td><td class="st"><span class="tag tag--out">Out of print</span></td></tr>
+            <tr><td class="yr">2024</td><td class="ti">Ledgers of Small Weather</td><td class="au">Petra Ilse</td><td class="st"><span class="tag tag--in">In print</span></td></tr>
+            <tr><td class="yr">2023</td><td class="ti">What the Hedge Keeps</td><td class="au">Owen Vale</td><td class="st"><span class="tag tag--out">Out of print</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the one action ────────────────────────────────────────── -->
+  <section class="offer" id="subscribe" aria-labelledby="h-sub">
+    <div class="wrap">
+      <div class="box">
+        <h2 id="h-sub">Four books a year</h2>
+        <p class="price">£68<small>a year · UK postage included</small></p>
+        <p>You get each edition in the week it leaves the bindery, numbered and before it goes on general sale. Cancel by replying to any dispatch note — we do not run a portal.</p>
+        <div class="row">
+          <a class="btn" href="#subscribe">Start with No.&nbsp;14</a>
+          <a class="btn btn--ghost" href="#current">Buy this one only — £19</a>
+        </div>
+      </div>
+      <p class="fine">
+        Overseas £96 a year. We post on Thursdays.<br>
+        Two of our four 2026 editions sold out before the second month.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="colophon" id="colophon">
+  <div class="wrap">
+    <div class="c1">
+      <h3>The press</h3>
+      <p>Marrowbone Press, Unit 4, Dove Lane, Bristol BS2. Founded 2019 by two people who wanted the books they could not buy.</p>
+    </div>
+    <div class="c2">
+      <h3>Colophon</h3>
+      <p>Set on the web in Bodoni Moda and Instrument Sans. Printed matter is set in Monotype Bembo and letterpressed from polymer.</p>
+    </div>
+    <div class="c3">
+      <h3>Elsewhere</h3>
+      <ul>
+        <li><a href="#colophon">Trade &amp; bookshops</a></li>
+        <li><a href="#colophon">Submissions — closed</a></li>
+        <li><a href="#colophon">post@marrowbone.press</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme');
+  function show(el, on){ if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden',''); }
+  function label(){
+    var dark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    show(btn.querySelector('.i-moon'), !dark);
+    show(btn.querySelector('.i-sun'),   dark);
+    return dark;
+  }
+  try { var s = localStorage.getItem('mb-theme'); if (s) root.setAttribute('data-theme', s); } catch (e) {}
+  label();
+  btn.addEventListener('click', function () {
+    var next = label() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    label();
+    try { localStorage.setItem('mb-theme', next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

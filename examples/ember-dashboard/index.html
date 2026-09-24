@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ember — self-hosted analytics</title>
+<meta name="description" content="Ember: self-hosted product analytics. Overview console.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Grounded 2026-09-24 against fonts.google.com/metadata/fonts:
+     Archivo      — variable, wght 100–900, wdth 62–125
+     Martian Mono — variable, wght 100–800, wdth 75–112.5 -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..110,400..800&family=Martian+Mono:wdth,wght@75..112.5,300..700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   EMBER — design tokens
+   One idea: an instrument panel, not a marketing dashboard.
+   Depth from hairlines + a lit top edge + grain. No blur, no gradient mush.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  /* DARK is the designed default — Ember lives on a wall-mounted screen. */
+  --bg:#14120F;          /* warm near-black, not blue-black */
+  --panel:#1C1915;
+  --raised:#262118;      /* raised surfaces get LIGHTER, not darker */
+  --ink:#F2EDE3;         /* 15.01:1 on --panel */
+  --ink-2:#A8A094;       /*  6.77:1 on --panel */
+  --ink-3:#948C7F;       /*  5.27:1 on --panel */
+  --accent:#FF8A3D;      /*  7.47:1 on --panel — the live ember */
+  --on-accent:#14120F;   /*  7.97:1 on --accent */
+  --line:rgba(242,237,227,.13);   /* hairline = ink at alpha, never grey */
+  --line-strong:rgba(242,237,227,.24);
+  --lit:rgba(242,237,227,.07);    /* the 1px lit top edge */
+  --s1:#FF8A3D;  /* trend series 1 — ember   7.47:1 */
+  --s2:#5CC8C2;  /* trend series 2 — coolant 8.75:1 */
+  --n1:#D8CFC0;  /* part-to-whole ramp      11.35:1 */
+  --n2:#A79E90;  /*                          6.62:1 */
+  --n3:#7E766A;  /*                          3.91:1 */
+  --pos:#7FD1A8;
+  --neg:#FF9B8A;
+  --grain:.05;
+
+  --ff-ui:'Archivo','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --ff-num:'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+
+  --t-xs:11px; --t-sm:12.5px; --t-base:14px; --t-md:15.5px; --t-lg:19px;
+  --kpi-hero:clamp(2.35rem,3.4vw,3.15rem);
+  --kpi:clamp(1.45rem,2vw,1.8rem);
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+  --sp-6:24px; --sp-8:32px; --sp-10:40px;
+
+  --r:3px;              /* instrument-panel radius. Not rounded-2xl. */
+  --r-chip:2px;
+  --ease:cubic-bezier(.32,.72,0,1);   /* the ONE curve */
+  --dur:180ms;
+}
+/* Light theme — re-drawn, not inverted: paper warms, accent darkens so it
+   stops glowing, series re-picked for a light ground. */
+:root[data-theme="light"]{
+  --bg:#F5F2EC; --panel:#FFFDF8; --raised:#EFE9DC;
+  --ink:#1B1815;        /* 15.82:1 on --bg */
+  --ink-2:#5E574C;      /*  6.38:1 */
+  --ink-3:#6B6357;      /*  5.30:1 */
+  --accent:#A8440A;     /*  5.38:1 on --bg */
+  --on-accent:#FFFDF8;
+  --line:rgba(27,24,21,.14);
+  --line-strong:rgba(27,24,21,.26);
+  --lit:rgba(255,255,255,.7);
+  --s1:#B24A0B; --s2:#0E5F5A;
+  --n1:#4A443B; --n2:#6B6357; --n3:#8A7F6C;   /* 9.47 / 5.82 / 3.87 */
+  --pos:#1E6B45; --neg:#A3341F;
+  --grain:.035;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F5F2EC; --panel:#FFFDF8; --raised:#EFE9DC;
+    --ink:#1B1815; --ink-2:#5E574C; --ink-3:#6B6357;
+    --accent:#A8440A; --on-accent:#FFFDF8;
+    --line:rgba(27,24,21,.14); --line-strong:rgba(27,24,21,.26);
+    --lit:rgba(255,255,255,.7);
+    --s1:#B24A0B; --s2:#0E5F5A;
+    --n1:#4A443B; --n2:#6B6357; --n3:#8A7F6C;
+    --pos:#1E6B45; --neg:#A3341F; --grain:.035;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--ff-ui); font-size:var(--t-base); line-height:1.5;
+  font-variation-settings:'wdth' 100,'wght' 400;
+  -webkit-font-smoothing:antialiased;
+}
+/* Material, not blur: a fine grain over the whole surface. */
+body::after{
+  content:""; position:fixed; inset:0; z-index:9; pointer-events:none;
+  opacity:var(--grain); mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:where(a,button,input,summary,[tabindex]):focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px; border-radius:var(--r-chip);
+}
+svg[hidden]{display:none}
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip{
+  position:absolute; left:var(--sp-3); top:-64px; z-index:20;
+  background:var(--accent); color:var(--on-accent); padding:12px 16px;
+  font-weight:600; border-radius:var(--r); transition:top var(--dur) var(--ease);
+}
+.skip:focus{top:var(--sp-3)}
+
+/* ── shell ──────────────────────────────────────────────────────── */
+.shell{display:grid; grid-template-columns:236px minmax(0,1fr); min-height:100vh}
+
+/* ── sidebar ────────────────────────────────────────────────────── */
+.side{
+  border-right:1px solid var(--line); background:var(--panel);
+  display:flex; flex-direction:column; position:sticky; top:0; height:100vh;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  padding:var(--sp-5) var(--sp-5) var(--sp-4);
+  border-bottom:1px solid var(--line);
+}
+.brand svg{flex:none}
+.brand b{
+  font-size:16px; font-variation-settings:'wdth' 94,'wght' 700;
+  letter-spacing:.015em;
+}
+.brand span{
+  display:block; font-family:var(--ff-num); font-size:9.5px; color:var(--ink-3);
+  font-variation-settings:'wdth' 82,'wght' 400; letter-spacing:.04em; margin-top:1px;
+}
+.nav{padding:var(--sp-4) var(--sp-3); overflow-y:auto; flex:1}
+.nav .grp{
+  margin:0 0 var(--sp-2);
+  font-size:var(--t-xs); text-transform:uppercase; letter-spacing:.16em;
+  color:var(--ink-3); font-variation-settings:'wdth' 90,'wght' 600;
+  margin:0 0 var(--sp-2); padding-inline:var(--sp-3);
+}
+.nav ul+.grp{margin-top:var(--sp-6)}
+.nav ul{list-style:none;margin:0;padding:0}
+.nav a{
+  display:flex; align-items:center; gap:10px; min-height:44px;
+  padding:0 var(--sp-3); color:var(--ink-2); text-decoration:none;
+  border-radius:var(--r); font-size:var(--t-base);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.nav a:hover{background:var(--raised); color:var(--ink)}
+.nav a[aria-current="page"]{
+  color:var(--ink); background:var(--raised);
+  box-shadow:inset 2px 0 0 var(--accent);   /* the lit rail */
+  font-variation-settings:'wdth' 100,'wght' 600;
+}
+.nav .dot{
+  margin-left:auto; font-family:var(--ff-num); font-size:10px; color:var(--ink-3);
+  font-variation-settings:'wdth' 80,'wght' 400;
+}
+.side-foot{
+  border-top:1px solid var(--line); padding:var(--sp-4) var(--sp-5);
+  font-family:var(--ff-num); font-size:10px; color:var(--ink-3);
+  font-variation-settings:'wdth' 80,'wght' 400; line-height:1.7;
+  display:grid; gap:1px;
+}
+.side-foot .bar{
+  display:block; width:100%; height:3px; background:var(--line); border-radius:99px; margin:6px 0 8px; overflow:hidden;
+}
+.side-foot .bar i{display:block;height:100%;width:38%;background:var(--accent)}
+
+/* ── topbar ─────────────────────────────────────────────────────── */
+.main{min-width:0; display:flex; flex-direction:column}
+.top{
+  display:flex; align-items:flex-end; gap:var(--sp-5); flex-wrap:wrap;
+  padding:var(--sp-6) var(--sp-8) var(--sp-5);
+  border-bottom:1px solid var(--line);
+}
+.top h1{
+  margin:0; font-size:clamp(1.35rem,2vw,1.75rem); line-height:1.1;
+  font-variation-settings:'wdth' 96,'wght' 700; letter-spacing:-.018em;
+  text-wrap:balance;
+}
+.top .sub{
+  margin:4px 0 0; color:var(--ink-3); font-size:var(--t-sm);
+  font-family:var(--ff-num); font-variation-settings:'wdth' 82,'wght' 400;
+}
+.top .spacer{flex:1 1 var(--sp-4)}
+.tools{display:flex; align-items:center; gap:var(--sp-2); flex-wrap:wrap}
+.tools-end{display:flex; align-items:center; gap:var(--sp-2)}
+.seg{display:flex; border:1px solid var(--line-strong); border-radius:var(--r); overflow:hidden}
+.seg button{
+  appearance:none; background:transparent; border:0; cursor:pointer;
+  min-height:44px; padding:0 14px; color:var(--ink-2);
+  font:inherit; font-size:var(--t-sm); font-family:var(--ff-num);
+  font-variation-settings:'wdth' 82,'wght' 400;
+  border-right:1px solid var(--line); transition:background var(--dur) var(--ease);
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--raised); color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--raised); color:var(--ink); font-variation-settings:'wdth' 82,'wght' 700}
+.btn{
+  appearance:none; cursor:pointer; min-height:44px; padding:0 18px;
+  border-radius:var(--r); font:inherit; font-size:var(--t-base);
+  font-variation-settings:'wdth' 96,'wght' 600;
+  border:1px solid var(--line-strong); background:transparent; color:var(--ink);
+  display:inline-flex; align-items:center; gap:8px;
+  transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.btn:hover{background:var(--raised); border-color:var(--ink-3)}
+.btn--primary{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+.btn--primary:hover{background:var(--accent); filter:brightness(1.08); border-color:var(--accent)}
+.btn--icon{padding:0; width:44px; justify-content:center}
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--ff-num); font-size:10.5px; letter-spacing:.04em;
+  font-variation-settings:'wdth' 80,'wght' 500;
+  border:1px solid var(--line-strong); border-radius:99px; padding:4px 10px;
+  color:var(--ink-2);
+}
+.pill i{width:6px;height:6px;border-radius:99px;background:var(--pos);flex:none}
+
+/* ── grid ───────────────────────────────────────────────────────── */
+.board{
+  flex:1; padding:var(--sp-6) var(--sp-8) var(--sp-10);
+  display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:var(--sp-4);
+  align-content:start;
+}
+.panel{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:inset 0 1px 0 var(--lit);   /* the lit top edge = real light logic */
+  padding:var(--sp-5); min-width:0;
+}
+.panel > header{
+  display:flex; align-items:baseline; gap:var(--sp-3); flex-wrap:wrap;
+  margin-bottom:var(--sp-4);
+}
+.panel > header h2, .panel > header h3{
+  margin:0; font-size:var(--t-xs); text-transform:uppercase; letter-spacing:.16em;
+  color:var(--ink-3); font-variation-settings:'wdth' 90,'wght' 600;
+}
+.panel .meta{
+  margin-left:auto; font-family:var(--ff-num); font-size:10.5px; color:var(--ink-3);
+  font-variation-settings:'wdth' 80,'wght' 400;
+}
+
+/* KPI row — deliberately UNEQUAL: the headline metric is twice the others. */
+.kpi{grid-column:span 3}
+.kpi--hero{grid-column:span 4}
+.kpi--tight{grid-column:span 2}
+.kpi .label{
+  font-size:var(--t-xs); text-transform:uppercase; letter-spacing:.16em;
+  color:var(--ink-3); font-variation-settings:'wdth' 90,'wght' 600;
+}
+.kpi .val{
+  font-family:var(--ff-num); font-size:var(--kpi); line-height:1;
+  font-variation-settings:'wdth' 88,'wght' 600; letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums; margin:var(--sp-3) 0 var(--sp-2);
+  display:block; word-spacing:-.34em;   /* mono spaces are full-width; group, don't gap */
+}
+.kpi--hero .val{font-size:var(--kpi-hero); font-variation-settings:'wdth' 100,'wght' 600}
+.kpi .unit{font-size:.52em; color:var(--ink-3); margin-left:4px; font-variation-settings:'wdth' 80,'wght' 400}
+.delta{
+  display:inline-flex; align-items:center; gap:5px;
+  font-family:var(--ff-num); font-size:11px; font-variation-settings:'wdth' 80,'wght' 500;
+  font-variant-numeric:tabular-nums;
+}
+/* Direction is carried by the glyph AND the word, never by hue alone. */
+.delta{white-space:nowrap}
+.delta--up{color:var(--pos)} .delta--down{color:var(--neg)} .delta--flat{color:var(--ink-3)}
+.dwrap{display:flex; flex-direction:column; gap:3px; min-width:0}
+.dnote{white-space:nowrap; font-family:var(--ff-num); font-size:10.5px; color:var(--ink-3); font-variation-settings:'wdth' 78,'wght' 400; font-variant-numeric:tabular-nums}
+.kpi .foot{display:flex; align-items:flex-end; gap:var(--sp-3); justify-content:space-between}
+.kpi:not(.kpi--hero) .foot{flex-direction:column; align-items:stretch; gap:var(--sp-3)}
+.kpi:not(.kpi--hero) .spark{width:100%}
+.spark{display:block; width:128px; height:34px; flex:none}
+
+/* Panels */
+.p-trend{grid-column:span 8}
+.p-share{grid-column:span 4}
+.p-sources{grid-column:span 5}
+.p-live{grid-column:span 7}
+.p-pages{grid-column:span 12}
+
+/* ── charts ─────────────────────────────────────────────────────── */
+.chart{width:100%; height:auto; display:block; overflow:visible}
+.scroller{overflow-x:auto; overscroll-behavior-x:contain}
+.scroller:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.c-grid{stroke:var(--line); stroke-width:1}
+.c-base{stroke:var(--line-strong); stroke-width:1}
+.c-axis{fill:var(--ink-3); font-family:var(--ff-num); font-size:10.5px; font-variation-settings:'wdth' 80,'wght' 400}
+.c-lbl{fill:var(--ink-2); font-family:var(--ff-ui); font-size:11.5px; font-variation-settings:'wdth' 90,'wght' 600}
+.c-num{fill:var(--ink); font-family:var(--ff-num); font-size:12.5px; font-variation-settings:'wdth' 85,'wght' 600; font-variant-numeric:tabular-nums}
+.ln{fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.ln--1{stroke:var(--s1)}
+.ln--2{stroke:var(--s2); stroke-dasharray:5 4}  /* 2nd series also differs by DASH */
+figcaption{
+  margin-top:var(--sp-3); color:var(--ink-3); font-size:var(--t-sm); line-height:1.5;
+  border-top:1px solid var(--line); padding-top:var(--sp-3);
+}
+
+.shares{list-style:none; margin:var(--sp-4) 0 0; padding:0}
+.shares li{display:grid; grid-template-columns:auto auto minmax(0,1fr) auto auto; align-items:center; gap:var(--sp-3); min-height:40px; border-top:1px solid var(--line); font-size:var(--t-sm)}
+.shares .sw{width:12px; height:12px; flex:none}
+.shares .sw--1{background:var(--n1)}
+.shares .sw--2{background:repeating-linear-gradient(45deg,var(--n2) 0 2px,var(--panel) 2px 4px)}
+.shares .sw--3{background:radial-gradient(circle at 2px 2px,var(--panel) 1px,var(--n3) 1px) 0 0/4px 4px}
+.shares b{font-family:var(--ff-num); font-size:var(--t-sm); font-variation-settings:'wdth' 82,'wght' 700; font-variant-numeric:tabular-nums}
+.shares .nm{color:var(--ink-2)}
+.shares i{font-family:var(--ff-num); font-style:normal; font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums; font-variation-settings:'wdth' 78,'wght' 400}
+.shares em{font-style:normal}
+/* horizontal bars — zero baseline, value printed at the end */
+.bars{list-style:none; margin:0; padding:0; display:grid; gap:2px}
+.bars li{display:grid; grid-template-columns:minmax(96px,150px) minmax(0,1fr) auto; align-items:center; gap:var(--sp-3); min-height:38px}
+.bars .k{color:var(--ink-2); font-size:var(--t-sm); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bars .t{height:12px; background:var(--line); border-radius:var(--r-chip); overflow:hidden}
+.bars .t i{display:block; height:100%; background:var(--n2); border-radius:var(--r-chip)}
+.bars li:first-child .t i{background:var(--accent)}   /* the accent only ever marks the leader */
+.bars li:first-child .k{color:var(--ink); font-variation-settings:'wdth' 100,'wght' 600}
+.bars .v{font-family:var(--ff-num); font-size:var(--t-sm); font-variation-settings:'wdth' 80,'wght' 500; font-variant-numeric:tabular-nums; color:var(--ink); text-align:right}
+
+/* ── table ──────────────────────────────────────────────────────── */
+.tcap{margin:0 0 var(--sp-4); color:var(--ink-3); font-size:var(--t-sm)}
+.tw:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.tw{overflow-x:auto; margin-inline:calc(var(--sp-5) * -1); padding-inline:var(--sp-5)}
+table{width:100%; border-collapse:collapse; min-width:620px}
+caption{text-align:left; color:var(--ink-3); font-size:var(--t-sm); padding-bottom:var(--sp-3)}
+th,td{padding:0 var(--sp-3); height:44px; text-align:left; border-bottom:1px solid var(--line)}
+th{
+  font-size:var(--t-xs); text-transform:uppercase; letter-spacing:.14em;
+  color:var(--ink-3); font-variation-settings:'wdth' 90,'wght' 600;
+  border-bottom:1px solid var(--line-strong); white-space:nowrap;
+}
+th.n,td.n{text-align:right}
+td.n{font-family:var(--ff-num); font-size:var(--t-sm); font-variant-numeric:tabular-nums; font-variation-settings:'wdth' 80,'wght' 400}
+td.path{font-family:var(--ff-num); font-size:var(--t-sm); font-variation-settings:'wdth' 80,'wght' 400; color:var(--ink)}
+tbody tr{transition:background var(--dur) var(--ease)}
+tbody tr:hover{background:var(--raised)}
+tbody tr:first-child td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+tbody tr:first-child td.path{font-variation-settings:'wdth' 80,'wght' 700}
+th button{
+  appearance:none; background:none; border:0; cursor:pointer; color:inherit; font:inherit;
+  padding:0; height:44px; display:inline-flex; align-items:center; gap:6px;
+  text-transform:inherit; letter-spacing:inherit;
+}
+th button:hover{color:var(--ink)}
+th[aria-sort] button{color:var(--ink)}
+th[aria-sort] button::after{content:"▼"; font-size:8px; color:var(--accent)}
+
+/* ── states (empty / loading / error), switched with :has() ───────── */
+.states{display:flex; align-items:center; gap:var(--sp-1); flex-wrap:wrap; margin-left:auto;
+        border:1px dashed var(--line-strong); border-radius:var(--r); padding:2px 2px 2px 10px}
+.stlbl{font-size:9.5px; text-transform:uppercase; letter-spacing:.18em; color:var(--ink-3);
+       font-variation-settings:'wdth' 88,'wght' 600}
+.states label{border-color:transparent}
+.states label{
+  display:inline-flex; align-items:center; min-height:44px; padding:0 12px;
+  border:1px solid var(--line); border-radius:var(--r); cursor:pointer;
+  font-family:var(--ff-num); font-size:10.5px; letter-spacing:.05em;
+  font-variation-settings:'wdth' 80,'wght' 400; color:var(--ink-3);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.states label:hover{background:var(--raised); color:var(--ink)}
+.states input{position:absolute; opacity:0; width:1px; height:1px}
+.states input:checked + span{color:var(--ink); font-variation-settings:'wdth' 80,'wght' 700}
+.states label:has(input:checked){background:var(--raised); border-color:var(--line-strong)}
+.states label:has(input:focus-visible){outline:2px solid var(--accent); outline-offset:2px}
+.state{display:none}
+.state--data{display:block}                                   /* graceful default */
+.p-live:has(#st-empty:checked)   .state{display:none}
+.p-live:has(#st-empty:checked)   .state--empty{display:block}
+.p-live:has(#st-loading:checked) .state{display:none}
+.p-live:has(#st-loading:checked) .state--loading{display:block}
+.p-live:has(#st-error:checked)   .state{display:none}
+.p-live:has(#st-error:checked)   .state--error{display:block}
+.p-live:has(#st-data:checked)    .state{display:none}
+.p-live:has(#st-data:checked)    .state--data{display:block}
+
+.events{list-style:none;margin:0;padding:0}
+.events li{
+  display:grid; grid-template-columns:auto auto minmax(0,1fr) auto; gap:var(--sp-3);
+  align-items:center; min-height:40px; border-bottom:1px solid var(--line);
+  font-size:var(--t-sm);
+}
+.events li:last-child{border-bottom:0}
+.events time,.events .geo{font-family:var(--ff-num); font-size:11px; color:var(--ink-3); font-variation-settings:'wdth' 78,'wght' 400; font-variant-numeric:tabular-nums}
+.events .ev{
+  font-family:var(--ff-num); font-size:10.5px; font-variation-settings:'wdth' 78,'wght' 500;
+  border:1px solid var(--line-strong); border-radius:var(--r-chip); padding:2px 7px; color:var(--ink-2);
+}
+.events .pth{color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:var(--ff-num); font-size:11.5px; font-variation-settings:'wdth' 78,'wght' 400}
+.events .geo{text-align:right}
+
+.blank{
+  border:1px dashed var(--line-strong); border-radius:var(--r);
+  padding:var(--sp-6); text-align:left; display:flex; gap:var(--sp-4); align-items:flex-start;
+}
+.blank .mk{flex:none; margin-top:2px}
+.blank h3{margin:0 0 6px; font-size:var(--t-md); font-variation-settings:'wdth' 96,'wght' 600}
+.blank p{margin:0 0 var(--sp-4); color:var(--ink-2); font-size:var(--t-sm); max-width:46ch}
+.blank code{font-family:var(--ff-num); font-size:11px; background:var(--raised); padding:2px 6px; border-radius:var(--r-chip); color:var(--ink)}
+.state--error .blank{border-style:solid; border-color:var(--neg)}
+.state--error h3{color:var(--neg)}
+
+.sk{display:grid; gap:var(--sp-3)}
+.sk i{
+  display:block; height:14px; border-radius:var(--r-chip); background:var(--raised);
+  position:relative; overflow:hidden;
+}
+.sk i::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,var(--line),transparent);
+  transform:translateX(-100%); animation:sweep 1400ms var(--ease) infinite;
+}
+.sk i:nth-child(2){width:82%} .sk i:nth-child(3){width:64%} .sk i:nth-child(4){width:73%}
+@keyframes sweep{to{transform:translateX(100%)}}
+
+/* ── responsive ─────────────────────────────────────────────────── */
+@media (max-width:1180px){
+  .kpi--hero{grid-column:span 6} .kpi{grid-column:span 2} .kpi--tight{grid-column:span 2}
+  .p-trend{grid-column:span 12} .p-share{grid-column:span 12}
+  .p-sources{grid-column:span 12} .p-live{grid-column:span 12}
+}
+@media (max-width:940px){
+  .kpi--hero{grid-column:span 12} .kpi,.kpi--tight{grid-column:span 4}
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)}
+  .brand{border-bottom:0; padding-bottom:var(--sp-3)}
+  .nav{display:flex; gap:var(--sp-2); overflow-x:auto; padding:0 var(--sp-4) var(--sp-3);
+       -webkit-mask-image:linear-gradient(90deg,#000 0 86%,transparent);
+       mask-image:linear-gradient(90deg,#000 0 86%,transparent)}
+  .nav .grp{display:none}
+  .nav ul{display:flex; gap:var(--sp-1)}
+  .nav a{white-space:nowrap; padding:0 14px}
+  .nav .dot{display:none}
+  .side-foot{display:flex; flex-wrap:wrap; align-items:center; gap:2px var(--sp-4); padding-block:10px}
+  .side-foot .bar{width:96px; margin:0}
+  .top,.board{padding-inline:var(--sp-5)}
+}
+@media (max-width:680px){
+  .kpi,.kpi--hero,.kpi--tight{grid-column:span 6}
+  .top,.board{padding-inline:var(--sp-4)}
+  .board{gap:var(--sp-3)}
+  .panel{padding:var(--sp-4)}
+  .tw{margin-inline:calc(var(--sp-4) * -1); padding-inline:var(--sp-4)}
+  /* a 14-day chart does not survive a 0.5x squeeze — it gets its own scroller */
+  .scroller > .chart{min-width:620px}
+  .kpi--hero .foot{flex-direction:column; align-items:stretch; gap:var(--sp-3)}
+  .kpi--hero .spark{width:100%}
+  .shares li{grid-template-columns:auto auto minmax(0,1fr) auto; row-gap:2px}
+  .shares em{grid-column:3/5; justify-self:end}
+  .spark{width:100%}
+  .events li{grid-template-columns:auto auto 1fr; row-gap:3px; padding-block:10px}
+  .events .ev{justify-self:start}
+  .events .pth{grid-column:1/-1}
+  .events .geo{grid-column:3; grid-row:1; text-align:right}
+}
+@media (max-width:430px){
+  .kpi,.kpi--hero,.kpi--tight{grid-column:span 12}
+  .states{margin-left:0; width:100%; justify-content:flex-start}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
+  .sk i::after{display:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#board">Skip to dashboard</a>
+
+<div class="shell">
+
+  <aside class="side">
+    <div class="brand">
+      <!-- the mark: a coal with one lit facet -->
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 15.5 9.5 3.5 20 8.5 15 20.5 4 15.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9.5 3.5 20 8.5 15 20.5 9.5 3.5Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      <div>
+        <b>Ember</b>
+        <span>ember-01 · v2.4.1</span>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Sections">
+      <p class="grp" id="ng-measure">Measure</p>
+      <ul aria-labelledby="ng-measure">
+        <li><a href="#board" aria-current="page">Overview</a></li>
+        <li><a href="#board">Traffic<span class="dot">38.5k</span></a></li>
+        <li><a href="#board">Funnels<span class="dot">6</span></a></li>
+        <li><a href="#board">Retention</a></li>
+      </ul>
+      <p class="grp" id="ng-collect">Collect</p>
+      <ul aria-labelledby="ng-collect">
+        <li><a href="#board">Events<span class="dot">41</span></a></li>
+        <li><a href="#board">Sources<span class="dot">9</span></a></li>
+        <li><a href="#board">Exclusions</a></li>
+      </ul>
+      <p class="grp" id="ng-node">Node</p>
+      <ul aria-labelledby="ng-node">
+        <li><a href="#board">Ingest log</a></li>
+        <li><a href="#board">Settings</a></li>
+      </ul>
+    </nav>
+
+    <div class="side-foot">
+      <span>COLD STORAGE 38%</span>
+      <span class="bar" aria-hidden="true"><i></i></span>
+      <span>142.6 GB / 380 GB</span>
+      <span>retention 24 mo · no third party</span>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <header class="top">
+      <div>
+        <h1>Overview</h1>
+        <p class="sub">10 – 23 Sep 2026 · compared with previous 14 days</p>
+      </div>
+      <div class="spacer"></div>
+      <div class="tools">
+        <span class="pill"><i></i>ingest live · 1.2k/min</span>
+        <div class="seg" role="group" aria-label="Date range">
+          <button type="button">24h</button>
+          <button type="button">7d</button>
+          <button type="button" aria-pressed="true">14d</button>
+          <button type="button">90d</button>
+        </div>
+        <div class="tools-end">
+          <button class="btn" type="button">Export CSV</button>
+          <button class="btn btn--icon" type="button" id="theme" aria-label="Switch to light theme">
+            <svg class="i-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.9 1.9M16.7 16.7l1.9 1.9M18.6 5.4l-1.9 1.9M7.3 16.7l-1.9 1.9"/>
+            </svg>
+            <svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" hidden>
+              <path d="M20.2 14.3A8.4 8.4 0 0 1 9.7 3.8a8.4 8.4 0 1 0 10.5 10.5Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="board" id="board" tabindex="-1">
+
+      <!-- ── KPI strip ──────────────────────────────────────────── -->
+      <section class="panel kpi kpi--hero" aria-labelledby="k1">
+        <span class="label" id="k1">Unique visitors</span>
+        <strong class="val">29 325</strong>
+        <div class="foot">
+          <div class="dwrap"><span class="delta delta--up">▲ +10.1%</span><span class="dnote">vs. 26 637 prior</span></div>
+          <svg class="spark" viewBox="0 0 128 34" role="img" aria-label="14-day shape, from 1,489 to 2,674 visitors per day">
+            <path d="M 4.0 22.3 L 13.2 20.7 L 22.5 24.2 L 31.7 18.0 L 40.9 14.2 L 50.2 27.5 L 59.4 30.0 L 68.6 16.5 L 77.8 13.1 L 87.1 14.7 L 96.3 10.0 L 105.5 7.1 L 114.8 11.8 L 124.0 4.0 L 124.0 34.0 L 4.0 34.0 Z" fill="var(--accent)" opacity=".13"/>
+            <path d="M 4.0 22.3 L 13.2 20.7 L 22.5 24.2 L 31.7 18.0 L 40.9 14.2 L 50.2 27.5 L 59.4 30.0 L 68.6 16.5 L 77.8 13.1 L 87.1 14.7 L 96.3 10.0 L 105.5 7.1 L 114.8 11.8 L 124.0 4.0" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="124" cy="4" r="2.4" fill="var(--accent)"/>
+          </svg>
+        </div>
+      </section>
+
+      <section class="panel kpi" aria-labelledby="k2">
+        <span class="label" id="k2">Sessions</span>
+        <strong class="val">38 530</strong>
+        <div class="foot">
+          <div class="dwrap"><span class="delta delta--up">▲ +8.4%</span><span class="dnote">vs 35 543 prior</span></div>
+          <svg class="spark" viewBox="0 0 128 34" role="img" aria-label="14-day shape, from 1,968 to 3,508 sessions per day">
+            <path d="M 4.0 22.5 L 13.2 21.0 L 22.5 24.4 L 31.7 17.8 L 40.9 14.2 L 50.2 27.5 L 59.4 30.0 L 68.6 16.6 L 77.8 12.9 L 87.1 14.7 L 96.3 9.9 L 105.5 7.3 L 114.8 11.8 L 124.0 4.0" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="124" cy="4" r="2.4" fill="var(--ink-2)"/>
+          </svg>
+        </div>
+      </section>
+
+      <section class="panel kpi" aria-labelledby="k3">
+        <span class="label" id="k3">Error rate</span>
+        <strong class="val">0.42<span class="unit">%</span></strong>
+        <div class="foot">
+          <div class="dwrap"><span class="delta delta--down">▼ −0.19 pp</span><span class="dnote">lower = better</span></div>
+          <svg class="spark" viewBox="0 0 128 34" role="img" aria-label="14-day shape, error rate falling from 0.64% to 0.42%">
+            <path d="M 4.0 7.1 L 13.2 10.2 L 22.5 4.0 L 31.7 13.4 L 40.9 19.6 L 50.2 15.4 L 59.4 21.7 L 68.6 17.5 L 77.8 24.8 L 87.1 22.7 L 96.3 26.9 L 105.5 30.0 L 114.8 24.8 L 124.0 26.9" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="124" cy="26.9" r="2.4" fill="var(--ink-2)"/>
+          </svg>
+        </div>
+      </section>
+
+      <section class="panel kpi kpi--tight" aria-labelledby="k4">
+        <span class="label" id="k4">Ingest p50</span>
+        <strong class="val">214<span class="unit">ms</span></strong>
+        <div class="foot">
+          <div class="dwrap"><span class="delta delta--flat">▲ +9 ms</span><span class="dnote">budget 250 ms</span></div>
+          <svg class="spark" viewBox="0 0 128 34" role="img" aria-label="14-day shape, ingest p50 between 199 and 221 milliseconds">
+            <path d="M 4.0 22.9 L 13.2 30.0 L 22.5 14.6 L 31.7 19.4 L 40.9 4.0 L 50.2 11.1 L 59.4 18.2 L 68.6 24.1 L 77.8 15.8 L 87.1 7.5 L 96.3 21.7 L 105.5 30.0 L 114.8 17.0 L 124.0 12.3" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="124" cy="12.3" r="2.4" fill="var(--ink-2)"/>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ── trend (the dominant view) ───────────────────────────── -->
+      <section class="panel p-trend" aria-labelledby="h-trend">
+        <header>
+          <h2 id="h-trend">Sessions &amp; unique visitors</h2>
+          <span class="meta">daily · 14 d</span>
+        </header>
+        <figure style="margin:0">
+          <div class="scroller" tabindex="0" role="region" aria-label="Sessions and unique visitors, 14-day line chart">
+          <svg class="chart" viewBox="0 0 720 250" role="img"
+               aria-label="Line chart. Sessions rise from 2,410 on 10 Sep to 3,508 on 23 Sep. Unique visitors rise from 1,840 to 2,674 over the same period. Both axes start at zero.">
+            <!-- gridlines, value axis from ZERO -->
+            <g class="c-grid">
+              <line x1="48" y1="18"  x2="596" y2="18"/>
+              <line x1="48" y1="65.5" x2="596" y2="65.5"/>
+              <line x1="48" y1="113" x2="596" y2="113"/>
+              <line x1="48" y1="160.5" x2="596" y2="160.5"/>
+            </g>
+            <line class="c-base" x1="48" y1="208" x2="596" y2="208"/>
+            <g class="c-axis" text-anchor="end">
+              <text x="40" y="21.5">3 600</text>
+              <text x="40" y="69">2 700</text>
+              <text x="40" y="116.5">1 800</text>
+              <text x="40" y="164">900</text>
+              <text x="40" y="211.5">0</text>
+            </g>
+            <g class="c-axis" text-anchor="middle">
+              <text x="48"  y="230">10 Sep</text>
+              <text x="174.5" y="230">13 Sep</text>
+              <text x="300.9" y="230">16 Sep</text>
+              <text x="427.4" y="230">19 Sep</text>
+              <text x="596" y="230">23 Sep</text>
+            </g>
+            <!-- series 2 (visitors) sits behind; dashed so it is not colour-only -->
+            <path class="ln ln--2" d="M 48.0 110.9 L 90.2 107.1 L 132.3 115.4 L 174.5 100.4 L 216.6 91.3 L 258.8 123.3 L 300.9 129.4 L 343.1 97.0 L 385.2 88.7 L 427.4 92.6 L 469.5 81.2 L 511.7 74.4 L 553.8 85.7 L 596.0 66.9"/>
+            <path class="ln ln--1" d="M 48.0 80.8 L 90.2 76.0 L 132.3 86.7 L 174.5 66.1 L 216.6 54.7 L 258.8 96.4 L 300.9 104.1 L 343.1 62.1 L 385.2 50.7 L 427.4 56.3 L 469.5 41.2 L 511.7 33.2 L 553.8 47.3 L 596.0 22.9"/>
+            <!-- end markers differ in SHAPE too -->
+            <circle cx="596" cy="22.9" r="3.6" fill="var(--s1)"/>
+            <rect x="592.6" y="63.3" width="7.2" height="7.2" fill="var(--panel)" stroke="var(--s2)" stroke-width="2"/>
+            <!-- direct labels beat a legend hunt -->
+            <g>
+              <text class="c-lbl" x="608" y="19">Sessions</text>
+              <text class="c-num" x="608" y="36">3 508</text>
+              <text class="c-lbl" x="608" y="63">Unique visitors</text>
+              <text class="c-num" x="608" y="80">2 674</text>
+            </g>
+          </svg>
+          </div>
+          <figcaption>Peak on 23 Sep followed the <em>v2.4</em> release note. The weekend dip (15–16 Sep) is normal for this property — it repeats every week in the 90-day view.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ── part-to-whole: 100% stacked bar, never a pie ────────── -->
+      <section class="panel p-share" aria-labelledby="h-share">
+        <header>
+          <h2 id="h-share">Device share</h2>
+          <span class="meta">of 38 530 sessions</span>
+        </header>
+        <figure style="margin:0">
+          <svg class="chart" viewBox="0 0 560 52" role="img"
+               aria-label="Share of sessions by device: desktop 61.4 per cent, mobile 31.2 per cent, tablet 7.4 per cent.">
+            <defs>
+              <!-- texture, so the three parts are not distinguished by hue alone -->
+              <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="7" height="7" fill="var(--n2)"/>
+                <line x1="0" y1="0" x2="0" y2="7" stroke="var(--panel)" stroke-width="3"/>
+              </pattern>
+              <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse">
+                <rect width="6" height="6" fill="var(--n3)"/>
+                <circle cx="3" cy="3" r="1.5" fill="var(--panel)"/>
+              </pattern>
+            </defs>
+            <rect x="0"     y="4" width="343.8" height="44" fill="var(--n1)"/>
+            <rect x="343.8" y="4" width="174.7" height="44" fill="url(#hatch)"/>
+            <rect x="518.6" y="4" width="41.4"  height="44" fill="url(#dots)"/>
+          </svg>
+          <ul class="shares">
+            <li><span class="sw sw--1" aria-hidden="true"></span><b>61.4%</b><span class="nm">Desktop</span><i>23 657</i><em class="delta delta--down">▼ 3.6 pp</em></li>
+            <li><span class="sw sw--2" aria-hidden="true"></span><b>31.2%</b><span class="nm">Mobile</span><i>12 021</i><em class="delta delta--up">▲ 4.1 pp</em></li>
+            <li><span class="sw sw--3" aria-hidden="true"></span><b>7.4%</b><span class="nm">Tablet</span><i>2 852</i><em class="delta delta--flat">▼ 0.5 pp</em></li>
+          </ul>
+          <figcaption>Mobile share has moved +4.1 pp in 90 days — the docs pages carry most of it.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ── compare categories: bars from zero ──────────────────── -->
+      <section class="panel p-sources" aria-labelledby="h-src">
+        <header>
+          <h2 id="h-src">Top sources</h2>
+          <span class="meta">sessions · scale 0 – 12 480</span>
+        </header>
+        <ul class="bars">
+          <li><span class="k">Direct / none</span><span class="t"><i style="width:100%"></i></span><span class="v">12 480</span></li>
+          <li><span class="k">github.com</span><span class="t"><i style="width:57.8%"></i></span><span class="v">7 215</span></li>
+          <li><span class="k">news.ycombinator.com</span><span class="t"><i style="width:39.3%"></i></span><span class="v">4 908</span></li>
+          <li><span class="k">google.com</span><span class="t"><i style="width:29.2%"></i></span><span class="v">3 644</span></li>
+          <li><span class="k">lobste.rs</span><span class="t"><i style="width:9.5%"></i></span><span class="v">1 190</span></li>
+          <li><span class="k">RSS readers</span><span class="t"><i style="width:5.9%"></i></span><span class="v">742</span></li>
+        </ul>
+      </section>
+
+      <!-- ── live panel + its empty / loading / error states ──────── -->
+      <section class="panel p-live" aria-labelledby="h-live">
+        <header>
+          <h2 id="h-live">Live events</h2>
+          <div class="states" role="group" aria-label="Preview panel state">
+            <span class="stlbl" aria-hidden="true">preview</span>
+            <label><input type="radio" name="st" id="st-data" checked><span>data</span></label>
+            <label><input type="radio" name="st" id="st-empty"><span>empty</span></label>
+            <label><input type="radio" name="st" id="st-loading"><span>loading</span></label>
+            <label><input type="radio" name="st" id="st-error"><span>error</span></label>
+          </div>
+        </header>
+
+        <div class="state state--data">
+          <ul class="events">
+            <li><time datetime="2026-09-23T14:31:08">14:31:08</time><span class="ev">pageview</span><span class="pth">/docs/self-hosting</span><span class="geo">DE</span></li>
+            <li><time datetime="2026-09-23T14:31:02">14:31:02</time><span class="ev">signup</span><span class="pth">/get-started</span><span class="geo">PL</span></li>
+            <li><time datetime="2026-09-23T14:30:55">14:30:55</time><span class="ev">pageview</span><span class="pth">/blog/why-we-dropped-cookies</span><span class="geo">US</span></li>
+            <li><time datetime="2026-09-23T14:30:49">14:30:49</time><span class="ev">export</span><span class="pth">/api/v2/events.csv</span><span class="geo">NL</span></li>
+            <li><time datetime="2026-09-23T14:30:41">14:30:41</time><span class="ev">pageview</span><span class="pth">/changelog</span><span class="geo">BR</span></li>
+            <li><time datetime="2026-09-23T14:30:33">14:30:33</time><span class="ev">error</span><span class="pth">/api/v2/ingest — 429</span><span class="geo">FR</span></li>
+          </ul>
+        </div>
+
+        <div class="state state--empty">
+          <div class="blank">
+            <svg class="mk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 10h18M8 5v14"/>
+            </svg>
+            <div>
+              <h3>No events in this window</h3>
+              <p>The collector is reachable but nothing has been sent since 03:12. If this is a fresh node, add the snippet to your layout and reload any page.</p>
+              <code>&lt;script defer src="https://ember-01/e.js"&gt;&lt;/script&gt;</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="state state--loading">
+          <p class="vh" role="status">Loading live events</p>
+          <div class="sk" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="state state--error">
+          <div class="blank" role="alert">
+            <svg class="mk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--neg)" stroke-width="1.5" aria-hidden="true">
+              <path d="M12 4 2.6 20h18.8L12 4Z"/><path d="M12 10v4.4M12 17.2v.1"/>
+            </svg>
+            <div>
+              <h3>Stream disconnected — 502 from ember-01</h3>
+              <p>The dashboard kept the last snapshot from 14:31:08. Ingest is unaffected; events are queued on disk and will replay when the stream returns.</p>
+              <button class="btn" type="button">Retry connection</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── table ──────────────────────────────────────────────── -->
+      <section class="panel p-pages" aria-labelledby="h-pages">
+        <header>
+          <h2 id="h-pages">Pages</h2>
+          <span class="meta">top 6 of 214</span>
+        </header>
+        <p class="tcap">Most-viewed paths, 10 – 23 Sep 2026. Figures are set in tabular numerals so columns align.</p>
+        <div class="tw" tabindex="0" role="region" aria-label="Pages table">
+          <table>
+            <caption class="vh">Most-viewed paths, 10 – 23 Sep 2026.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Path</th>
+                <th scope="col" class="n" aria-sort="descending"><button type="button">Views</button></th>
+                <th scope="col" class="n"><button type="button">Uniques</button></th>
+                <th scope="col" class="n"><button type="button">Median time</button></th>
+                <th scope="col" class="n"><button type="button">Bounce</button></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">/docs/self-hosting</td><td class="n">9 412</td><td class="n">6 880</td><td class="n">4 m 12 s</td><td class="n">21.4%</td></tr>
+              <tr><td class="path">/</td><td class="n">8 197</td><td class="n">7 043</td><td class="n">0 m 48 s</td><td class="n">55.8%</td></tr>
+              <tr><td class="path">/blog/why-we-dropped-cookies</td><td class="n">5 330</td><td class="n">4 902</td><td class="n">6 m 05 s</td><td class="n">62.1%</td></tr>
+              <tr><td class="path">/pricing</td><td class="n">3 118</td><td class="n">2 640</td><td class="n">1 m 33 s</td><td class="n">38.7%</td></tr>
+              <tr><td class="path">/docs/api</td><td class="n">2 744</td><td class="n">1 905</td><td class="n">3 m 27 s</td><td class="n">24.9%</td></tr>
+              <tr><td class="path">/changelog</td><td class="n">1 986</td><td class="n">1 511</td><td class="n">2 m 02 s</td><td class="n">44.3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme');
+  // :root ships the dark palette; a light OS preference flips it. Reflect whichever
+  // is actually in force, so the toggle icon always shows the ACTION, not the state.
+  function show(el, on){ if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden',''); }
+  function effective(){
+    var set = root.getAttribute('data-theme');
+    if (set) return set;
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  function paint(){
+    var t = effective();
+    btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    show(btn.querySelector('.i-sun'),  t === 'dark');
+    show(btn.querySelector('.i-moon'), t !== 'dark');
+  }
+  try { var saved = localStorage.getItem('ember-theme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+  paint();
+  btn.addEventListener('click', function () {
+    var next = effective() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    paint();
+    try { localStorage.setItem('ember-theme', next); } catch (e) {}
+  });
+  // date range is a real segmented control
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      b.parentNode.querySelectorAll('button').forEach(function (o) { o.removeAttribute('aria-pressed'); });
+      b.setAttribute('aria-pressed', 'true');
+    });
+  });
+})();
+</script>
+</body>
+</html>
