@@ -84,7 +84,7 @@ the anti-slop pass applied to the actual pixels.
 
 | Ember — self-hosted analytics dashboard | Marrowbone Press — publisher landing |
 |---|---|
-| ![Ember dashboard, dark](examples/screenshots/ember-dark-1280.png) | ![Marrowbone Press landing, light](examples/screenshots/marrowbone-light-1280.png) |
+| ![Ember dashboard, dark](examples/screenshots/ember-teaser.png) | ![Marrowbone Press landing, light](examples/screenshots/marrowbone-teaser.png) |
 | *An instrument panel, not a marketing dashboard — hairlines, tabular figures, one hot accent reserved for the live signal.* | *Set like the title page of a book it sells — cold grey-green paper (not cream), Bodoni Moda display.* |
 
 **→ [Browse the full showcase with all screenshots and design notes](examples/README.md)**
